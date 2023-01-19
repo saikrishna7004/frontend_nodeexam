@@ -53,6 +53,13 @@ const New = () => {
         console.log(newQuestions[questionIndex].answer)
     };
 
+    const handleMarksChange = (e, questionIndex) => {
+        const newQuestions = [...questions];
+        newQuestions[questionIndex].marks = e.target.value;
+        setQuestions(newQuestions);
+        console.log(newQuestions[questionIndex].marks)
+    };
+
     const handleType = (e, questionIndex) => {
         console.log(e.target.value)
         const newQuestions = [...questions];
@@ -132,7 +139,7 @@ const New = () => {
                     <div className='row'>
                         <div className="col-md-3">
                             <label className='form-label'>Marks: </label>
-                            <input className='form-control' type="text" value={question.marks} onChange={(e) => handleAnswerChange(e, questionIndex)} min={1} max={4} />
+                            <input className='form-control' type="text" value={question.marks} onChange={(e) => handleMarksChange(e, questionIndex)} min={1} max={4} />
                         </div>
                     </div>
                 </div>
