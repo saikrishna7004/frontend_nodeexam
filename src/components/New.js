@@ -2,11 +2,18 @@ import React, { useState } from 'react'
 
 const New = () => {
 
-    const [questions, setQuestions] = useState([{ question: '', options: ['', '', '', ''], answer: -1 }])
-    const [examId, setexamId] = useState()
+    const [questions, setQuestions] = useState([{ question: '', options: [''], answers: [false], marks: '', type: '', answer: '' }])
+    const [examId, setexamId] = useState('')
 
     const handleAddQuestion = () => {
-        setQuestions([...questions, { question: "", options: ["", "", "", ""], answer: -1 }]);
+        setQuestions([...questions, { question: '', options: [''], answers: [false], marks: '', type: '', answer: '' }]);
+    };
+
+    const handleAddOption = (ind) => {
+        const newQuestions = [...questions]
+        newQuestions[ind].options = [...newQuestions[ind].options, '']
+        newQuestions[ind].answers = [...newQuestions[ind].answers, false]
+        setQuestions(newQuestions);
     };
 
     const handleExamId = (e) => {
@@ -25,9 +32,35 @@ const New = () => {
         setQuestions(newQuestions);
     };
 
-    const handleAnswerChange = (e, index) => {
+    const handleAnswerChange = (e, questionIndex, answerIndex, multi) => {
+        console.log(e.target.checked)
         const newQuestions = [...questions];
-        newQuestions[index].answer = e.target.value;
+        let ans = newQuestions[questionIndex].answers
+        if (!multi) {
+            for (let i = 0; i < ans.length; i++) {
+                newQuestions[questionIndex].answers[i] = false
+            }
+        }
+        newQuestions[questionIndex].answers[answerIndex] = e.target.checked;
+        setQuestions(newQuestions);
+        console.log(newQuestions[questionIndex].answers)
+    };
+
+    const handleNumberAnswerChange = (e, questionIndex) => {
+        const newQuestions = [...questions];
+        newQuestions[questionIndex].answer = e.target.value;
+        setQuestions(newQuestions);
+        console.log(newQuestions[questionIndex].answer)
+    };
+
+    const handleType = (e, questionIndex) => {
+        console.log(e.target.value)
+        const newQuestions = [...questions];
+        newQuestions[questionIndex].type = e.target.value;
+        let ans = newQuestions[questionIndex].answers
+        for (let i = 0; i < ans.length; i++) {
+            newQuestions[questionIndex].answers[i] = false
+        }
         setQuestions(newQuestions);
     };
 
@@ -52,19 +85,55 @@ const New = () => {
             </div>
             {questions.map((question, questionIndex) => (
                 <div className='card p-3 my-3' key={'q' + questionIndex}>
-                    <label className='form-label'>Question {questionIndex + 1}:</label>
-                    <input className='form-control' type="text" value={question.question} onChange={(e) => handleQuestionChange(e, questionIndex)} />
-                    <div className="row my-3">
+                    <div className="mb-2">
+                        <label className='form-label'>Question {questionIndex + 1}:</label>
+                        <input className='form-control' type="text" value={question.question} onChange={(e) => handleQuestionChange(e, questionIndex)} />
+                    </div>
+                    <div className="my-2">
+                        <label className='form-label'>Question Type</label>
+                        <select className="form-select" aria-label="Select Question Type" value={question.type} onChange={e => handleType(e, questionIndex)}>
+                            <option value="">-- Select --</option>
+                            <option value="mcq">Multi Choice</option>
+                            <option value="maq">Multi Answer</option>
+                            <option value="int">Integer</option>
+                            <option value="dec">Decimal</option>
+                            <option value="desc">Descriptive</option>
+                        </select>
+                    </div>
+                    {(question.type == 'mcq' || question.type == 'maq') && <div className="row my-2">
                         {question.options.map((option, optionIndex) => (
-                            <div className="col-md-3" key={'o' + optionIndex + 'q' + questionIndex}>
+                            <div className="col-md-3 mb-2" key={'o' + optionIndex + 'q' + questionIndex}>
                                 <label className='form-label'>Option {optionIndex + 1}: </label>
                                 <input className='form-control' type="text" value={option} onChange={(e) => handleOptionChange(e, questionIndex, optionIndex)} />
                             </div>
                         ))}
-                    </div>
-                    <div className="col-md-3">
+                        <div>
+                            <button className='btn btn-primary mb-4' onClick={(e) => handleAddOption(questionIndex)}>+ Add Option</button>
+                        </div>
+                    </div>}
+                    {question.type != 'desc' && <div className="my-2">
                         <label className='form-label'>Correct Answer: </label>
-                        <input className='form-control' type="text" value={question.answer} onChange={(e) => handleAnswerChange(e, questionIndex)} min={1} max={4} />
+                        {question.type == 'mcq' && question.answers.map((answer, answerIndex) => (
+                            <div className="" key={'o' + answerIndex + 'q' + questionIndex}>
+                                <input className='form-radio' name={'q' + questionIndex} id={'o' + answerIndex + 'q' + questionIndex} type="radio" checked={answer} onChange={(e) => handleAnswerChange(e, questionIndex, answerIndex)} />
+                                &nbsp;<label className='form-label' htmlFor={'o' + answerIndex + 'q' + questionIndex}>Option {answerIndex + 1} </label>
+                            </div>
+                        ))}
+                        {question.type == 'maq' && question.answers.map((answer, answerIndex) => (
+                            <div className="" key={'o' + answerIndex + 'q' + questionIndex}>
+                                <input className='form-check' name={'q' + questionIndex} id={'o' + answerIndex + 'q' + questionIndex} type="checkbox" checked={answer} onChange={(e) => handleAnswerChange(e, questionIndex, answerIndex, true)} />
+                                &nbsp;<label className='form-label' htmlFor={'o' + answerIndex + 'q' + questionIndex}>Option {answerIndex + 1} </label>
+                            </div>
+                        ))}
+                        {(question.type == 'int' || question.type == 'dec') && <div className="">
+                            <input className='form-control' type="number" value={question.answer} onChange={(e) => handleNumberAnswerChange(e, questionIndex)} />
+                        </div>}
+                    </div>}
+                    <div className='row'>
+                        <div className="col-md-3">
+                            <label className='form-label'>Marks: </label>
+                            <input className='form-control' type="text" value={question.marks} onChange={(e) => handleAnswerChange(e, questionIndex)} min={1} max={4} />
+                        </div>
                     </div>
                 </div>
             ))}
