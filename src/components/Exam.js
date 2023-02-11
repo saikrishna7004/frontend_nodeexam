@@ -6,6 +6,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const Exam = ({ token }) => {
 	if (!token) return <Navigate to={'/login'} />
+	else{
+		console.log("object")
+	}
 	return (
 		<div>
 			<div className="container my-3">
